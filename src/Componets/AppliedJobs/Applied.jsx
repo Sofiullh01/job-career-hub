@@ -4,8 +4,23 @@ import { getStoredJobApplication } from "../../Utility/localStor";
 import ApCard from "../ApCard/ApCard";
 
 const Applied = () => {
+    const jobs = useLoaderData();
   const [appliedJobs, setAppliedJob] = useState([]);
-  const jobs = useLoaderData();
+  const [displayJob, setDisplayJob ] = useState([]);
+
+  const handleJobsFilter = filter => {
+    if(filter === 'All'){
+        setDisplayJob(appliedJobs);
+    }
+    else if(filter === 'Remote'){
+        const remoteJob = appliedJobs.filter(job => job.remote_or_onsite === 'Remote');
+        setDisplayJob(remoteJob)
+    }
+    else if(filter === 'Onside'){
+        const onsideJob = appliedJobs.filter(job => job.remote_or_onsite === 'Onsite');
+        setDisplayJob(onsideJob)
+    }
+  }
 
   useEffect(() => {
     const storedJobId = getStoredJobApplication();
@@ -21,7 +36,7 @@ const Applied = () => {
         }
       }
       setAppliedJob(jobsApplied);
-      console.log(jobsApplied);
+      setDisplayJob(jobsApplied);
     }
   }, [jobs, setAppliedJob]);
 
@@ -42,13 +57,13 @@ const Applied = () => {
       <details className=" dropdown mb-32 flex justify-end w-36 ">
         <summary className="m-1 btn">open or close</summary>
         <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-32">
-          <li>
+          <li onClick={()=>handleJobsFilter('All')}>
             <a>All</a>
           </li>
-          <li>
+          <li onClick={()=>handleJobsFilter('Remote')}>
             <a>Remote</a>
           </li>
-          <li>
+          <li onClick={()=>handleJobsFilter('Onside')}>
             <a>Onside</a>
           </li>
         </ul>
@@ -56,7 +71,7 @@ const Applied = () => {
       </div>
       <div className="space-y-5">
         {
-            appliedJobs?.map(job => <ApCard 
+            displayJob?.map(job => <ApCard 
                 key={job.id}
                 job={job}
                 ></ApCard>)
